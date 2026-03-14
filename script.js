@@ -2,6 +2,15 @@ const screensGrid = document.getElementById("screens-grid");
 const form = document.getElementById("waitlist-form");
 const messageEl = document.getElementById("form-message");
 
+if ("scrollRestoration" in history) {
+  history.scrollRestoration = "manual";
+}
+
+window.addEventListener("load", () => {
+  // Always start from top on refresh/navigation to avoid sticky offset accumulation.
+  window.scrollTo(0, 0);
+});
+
 function getSortKey(path) {
   const filename = path.split("/").pop() || "";
   const match = filename.match(/(\d+)/);

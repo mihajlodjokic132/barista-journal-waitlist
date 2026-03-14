@@ -37,6 +37,12 @@ html,
 body {
   margin: 0;
   padding: 0;
+  background-color: var(--brew-background);
+  overscroll-behavior-y: none;
+}
+
+html {
+  min-height: 100%;
 }
 
 body {
