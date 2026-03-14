@@ -38,7 +38,7 @@ function renderScreenshots() {
   let isDragging = false;
   let isAnimating = false;
   const snapDurationMs = 260;
-  const commitThreshold = 0.28;
+  const mobileCommitThreshold = 0.22;
 
   const carousel = document.createElement("div");
   carousel.className = "screens-carousel";
@@ -71,9 +71,17 @@ function renderScreenshots() {
   nextImage.draggable = false;
   nextFigure.appendChild(nextImage);
 
-  const hint = document.createElement("p");
-  hint.className = "screens-hint";
-  hint.textContent = "Drag left or right to browse";
+  const previousButton = document.createElement("button");
+  previousButton.type = "button";
+  previousButton.className = "screens-arrow screens-arrow-left";
+  previousButton.setAttribute("aria-label", "Previous screenshot");
+  previousButton.textContent = "<";
+
+  const nextButton = document.createElement("button");
+  nextButton.type = "button";
+  nextButton.className = "screens-arrow screens-arrow-right";
+  nextButton.setAttribute("aria-label", "Next screenshot");
+  nextButton.textContent = ">";
 
   function wrapIndex(index) {
     const total = screenshots.length;
@@ -164,7 +172,7 @@ function renderScreenshots() {
   }
 
   function commit(direction) {
-    if (isAnimating || isDragging || screenshots.length < 2) return;
+    if (isAnimating || screenshots.length < 2) return;
 
     isAnimating = true;
     snapTo(direction, () => completeSlide(direction));
@@ -190,11 +198,14 @@ function renderScreenshots() {
     }
   });
 
+  previousButton.addEventListener("click", goPrevious);
+  nextButton.addEventListener("click", goNext);
   previousFigure.addEventListener("click", goPrevious);
   nextFigure.addEventListener("click", goNext);
 
   stage.addEventListener("pointerdown", (event) => {
-    if (isAnimating) return;
+    const isMobileLayout = window.matchMedia("(max-width: 580px)").matches;
+    if (isAnimating || !isMobileLayout) return;
 
     event.preventDefault();
     activePointerId = event.pointerId;
@@ -223,10 +234,10 @@ function renderScreenshots() {
     activePointerId = null;
     stage.classList.remove("dragging");
 
-    if (dragProgress > commitThreshold) {
+    if (dragProgress > mobileCommitThreshold) {
       isAnimating = true;
       snapTo(1, () => completeSlide(1));
-    } else if (dragProgress < -commitThreshold) {
+    } else if (dragProgress < -mobileCommitThreshold) {
       isAnimating = true;
       snapTo(-1, () => completeSlide(-1));
     } else {
@@ -249,9 +260,10 @@ function renderScreenshots() {
   stage.appendChild(previousFigure);
   stage.appendChild(figure);
   stage.appendChild(nextFigure);
+  stage.appendChild(previousButton);
+  stage.appendChild(nextButton);
 
   carousel.appendChild(stage);
-  carousel.appendChild(hint);
   screensGrid.appendChild(carousel);
 
   updateSlideSources();
