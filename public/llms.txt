@@ -1,0 +1,14 @@
+# Barista Journal
+
+> Barista Journal is an iOS app for home espresso enthusiasts to track, learn, and improve every shot.
+
+## Canonical Site
+- https://www.baristajournalpro.com/
+
+## Product Summary
+- Personal espresso log with dose, yield, extraction time, and notes
+- Built-in learning and troubleshooting guidance
+- Waitlist available at /#waitlist
+
+## Contact
+- Use the waitlist form on the website for launch updates.
