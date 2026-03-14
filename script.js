@@ -32,8 +32,13 @@ function renderScreenshots() {
   }
 
   let currentIndex = 0;
+  let activePointerId = null;
   let dragStartX = 0;
+  let dragProgress = 0;
   let isDragging = false;
+  let isAnimating = false;
+  const snapDurationMs = 260;
+  const commitThreshold = 0.28;
 
   const carousel = document.createElement("div");
   carousel.className = "screens-carousel";
@@ -43,7 +48,7 @@ function renderScreenshots() {
   stage.tabIndex = 0;
 
   const previousFigure = document.createElement("figure");
-  previousFigure.className = "screen-card screen-side screen-side-left";
+  previousFigure.className = "screen-card screen-prev";
 
   const previousImage = document.createElement("img");
   previousImage.loading = "lazy";
@@ -57,7 +62,7 @@ function renderScreenshots() {
   figure.appendChild(image);
 
   const nextFigure = document.createElement("figure");
-  nextFigure.className = "screen-card screen-side screen-side-right";
+  nextFigure.className = "screen-card screen-next";
 
   const nextImage = document.createElement("img");
   nextImage.loading = "lazy";
@@ -72,7 +77,7 @@ function renderScreenshots() {
     return (index + total) % total;
   }
 
-  function updateSlide() {
+  function updateSlideSources() {
     const current = screenshots[currentIndex];
     const previous = screenshots[wrapIndex(currentIndex - 1)];
     const next = screenshots[wrapIndex(currentIndex + 1)];
@@ -87,14 +92,77 @@ function renderScreenshots() {
     nextImage.alt = "Next app screenshot preview";
   }
 
+  function setCardStyle(card, x, scale, opacity, blur, zIndex) {
+    card.style.transform = `translateX(${x}px) scale(${scale})`;
+    card.style.opacity = String(opacity);
+    card.style.filter = `blur(${blur}px) saturate(0.9) brightness(0.8)`;
+    card.style.zIndex = String(zIndex);
+  }
+
+  function applyLayout(progress) {
+    const stageWidth = stage.clientWidth || 640;
+    const spacing = Math.min(stageWidth * 0.34, 220);
+
+    const prevX = -spacing + progress * spacing;
+    const currentX = progress * spacing;
+    const nextX = spacing + progress * spacing;
+
+    const prevScale = 0.9 + Math.max(0, progress) * 0.1;
+    const currentScale = 1 - Math.abs(progress) * 0.1;
+    const nextScale = 0.9 + Math.max(0, -progress) * 0.1;
+
+    const prevOpacity = 0.42 + Math.max(0, progress) * 0.5;
+    const currentOpacity = 1 - Math.abs(progress) * 0.28;
+    const nextOpacity = 0.42 + Math.max(0, -progress) * 0.5;
+
+    const prevBlur = Math.max(0.4, 3 - Math.max(0, progress) * 2.6);
+    const nextBlur = Math.max(0.4, 3 - Math.max(0, -progress) * 2.6);
+
+    setCardStyle(previousFigure, prevX, prevScale, prevOpacity, prevBlur, 1);
+    setCardStyle(figure, currentX, currentScale, currentOpacity, 0, 3);
+    setCardStyle(nextFigure, nextX, nextScale, nextOpacity, nextBlur, 1);
+  }
+
+  function snapTo(targetProgress, onDone) {
+    dragProgress = targetProgress;
+    applyLayout(dragProgress);
+
+    window.setTimeout(() => {
+      onDone?.();
+    }, snapDurationMs);
+  }
+
+  function completeSlide(direction) {
+    if (direction < 0) {
+      currentIndex = wrapIndex(currentIndex + 1);
+    } else {
+      currentIndex = wrapIndex(currentIndex - 1);
+    }
+
+    stage.classList.add("is-dragging");
+    dragProgress = 0;
+    updateSlideSources();
+    applyLayout(dragProgress);
+
+    requestAnimationFrame(() => {
+      stage.classList.remove("is-dragging");
+      isAnimating = false;
+    });
+  }
+
+  function commit(direction) {
+    if (isAnimating || isDragging || screenshots.length < 2) return;
+
+    isAnimating = true;
+    snapTo(direction, () => completeSlide(direction));
+  }
+
   function goPrevious() {
-    currentIndex = wrapIndex(currentIndex - 1);
-    updateSlide();
+    commit(1);
   }
 
   function goNext() {
-    currentIndex = wrapIndex(currentIndex + 1);
-    updateSlide();
+    commit(-1);
   }
 
   stage.addEventListener("keydown", (event) => {
@@ -109,7 +177,13 @@ function renderScreenshots() {
     }
   });
 
+  previousFigure.addEventListener("click", goPrevious);
+  nextFigure.addEventListener("click", goNext);
+
   stage.addEventListener("pointerdown", (event) => {
+    if (isAnimating) return;
+
+    activePointerId = event.pointerId;
     dragStartX = event.clientX;
     isDragging = true;
     stage.classList.add("dragging");
@@ -117,30 +191,43 @@ function renderScreenshots() {
   });
 
   stage.addEventListener("pointermove", (event) => {
-    if (!isDragging) return;
+    if (!isDragging || event.pointerId !== activePointerId) return;
+
     const delta = event.clientX - dragStartX;
-    stage.style.setProperty("--drag-offset", `${delta}px`);
+    const stageWidth = stage.clientWidth || 640;
+
+    dragProgress = Math.max(-1, Math.min(1, delta / (stageWidth * 0.45)));
+    applyLayout(dragProgress);
   });
 
   function handleDragEnd(event) {
-    if (!isDragging) return;
-
-    const delta = event.clientX - dragStartX;
-    const threshold = 55;
+    if (!isDragging || event.pointerId !== activePointerId) return;
 
     isDragging = false;
+    activePointerId = null;
     stage.classList.remove("dragging");
-    stage.style.setProperty("--drag-offset", "0px");
 
-    if (delta > threshold) {
-      goPrevious();
-    } else if (delta < -threshold) {
-      goNext();
+    if (dragProgress > commitThreshold) {
+      isAnimating = true;
+      snapTo(1, () => completeSlide(1));
+    } else if (dragProgress < -commitThreshold) {
+      isAnimating = true;
+      snapTo(-1, () => completeSlide(-1));
+    } else {
+      snapTo(0);
+    }
+
+    if (typeof event.pointerId === "number" && stage.hasPointerCapture(event.pointerId)) {
+      stage.releasePointerCapture(event.pointerId);
     }
   }
 
   stage.addEventListener("pointerup", handleDragEnd);
   stage.addEventListener("pointercancel", handleDragEnd);
+
+  window.addEventListener("resize", () => {
+    applyLayout(dragProgress);
+  });
 
   stage.appendChild(previousFigure);
   stage.appendChild(figure);
@@ -150,7 +237,8 @@ function renderScreenshots() {
   carousel.appendChild(hint);
   screensGrid.appendChild(carousel);
 
-  updateSlide();
+  updateSlideSources();
+  applyLayout(0);
 }
 
 renderScreenshots();

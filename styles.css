@@ -296,17 +296,23 @@ h2 {
   min-height: 560px;
   display: grid;
   place-items: center;
-  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
   cursor: grab;
   user-select: none;
-  --drag-offset: 0px;
 }
 
 .screens-stage.dragging {
   cursor: grabbing;
 }
 
+.screens-stage.is-dragging .screen-card,
+.screens-stage.dragging .screen-card {
+  transition: none;
+}
+
 .screen-card {
+  position: absolute;
+  width: min(320px, 72vw);
   border-radius: var(--radius-xl);
   background: rgba(36, 31, 43, 0.9);
   border: 1px solid rgba(232, 168, 124, 0.12);
@@ -314,34 +320,18 @@ h2 {
   overflow: hidden;
   aspect-ratio: 9 / 19;
   margin: 0;
+  transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 260ms ease,
+    filter 260ms ease;
+  will-change: transform, filter, opacity;
 }
 
 .screen-current {
-  width: min(320px, 72vw);
   z-index: 3;
-  transform: translateX(calc(var(--drag-offset) * 0.07));
-  transition: transform 220ms ease, box-shadow 220ms ease;
 }
 
-.screen-side {
-  position: absolute;
-  top: 50%;
-  width: min(230px, 45vw);
-  opacity: 0.55;
-  filter: blur(3px) saturate(0.8) brightness(0.72);
-  z-index: 1;
-  pointer-events: none;
-  border-color: rgba(154, 147, 168, 0.18);
-}
-
-.screen-side-left {
-  left: 0;
-  transform: translate(-28%, -50%) scale(0.95);
-}
-
-.screen-side-right {
-  right: 0;
-  transform: translate(28%, -50%) scale(0.95);
+.screen-prev,
+.screen-next {
+  cursor: pointer;
 }
 
 .screen-card img {
@@ -501,7 +491,8 @@ h2 {
     width: min(280px, 72vw);
   }
 
-  .screen-side {
+  .screen-prev,
+  .screen-next {
     width: min(180px, 34vw);
   }
 
@@ -536,7 +527,8 @@ h2 {
     min-height: 430px;
   }
 
-  .screen-side {
+  .screen-prev,
+  .screen-next {
     display: none;
   }
 
