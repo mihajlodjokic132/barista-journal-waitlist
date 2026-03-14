@@ -160,15 +160,16 @@ function renderScreenshots() {
       currentIndex = wrapIndex(currentIndex - 1);
     }
 
+    // Reset layout without animation to avoid a visible reverse motion.
     stage.classList.add("is-dragging");
     dragProgress = 0;
     updateSlideSources();
     applyLayout(dragProgress);
 
-    requestAnimationFrame(() => {
-      stage.classList.remove("is-dragging");
-      isAnimating = false;
-    });
+    // Force style flush so removing the class does not animate the reset.
+    void stage.offsetWidth;
+    stage.classList.remove("is-dragging");
+    isAnimating = false;
   }
 
   function commit(direction) {
@@ -198,8 +199,15 @@ function renderScreenshots() {
     }
   });
 
-  previousButton.addEventListener("click", goPrevious);
-  nextButton.addEventListener("click", goNext);
+  previousButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    goPrevious();
+  });
+
+  nextButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    goNext();
+  });
   previousFigure.addEventListener("click", goPrevious);
   nextFigure.addEventListener("click", goNext);
 
