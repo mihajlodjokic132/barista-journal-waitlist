@@ -436,21 +436,19 @@ form?.addEventListener("submit", async (event) => {
     source: "landing-page",
   });
 
-  // Send to Loops API if Supabase insert succeeded
+  // Send to Loops via serverless function if Supabase insert succeeded
   let loopsError = null;
   if (!error) {
     try {
-      const loopsRes = await fetch("https://app.loops.so/api/v1/contacts/import", {
+      const loopsRes = await fetch("/api/loops-waitlist", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${import.meta.env.VITE_LOOPS_API_KEY}`,
         },
         body: JSON.stringify({
           email,
           name,
-          source: "waitlist",
-          skill_level: skill,
+          skill,
         }),
       });
       if (!loopsRes.ok) {
