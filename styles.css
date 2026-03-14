@@ -293,8 +293,9 @@ h2 {
 }
 
 .screens-stage {
+  --carousel-card-width: min(320px, 72vw);
   position: relative;
-  min-height: 560px;
+  min-height: calc((var(--carousel-card-width) * 19 / 9) + 20px);
   display: grid;
   place-items: center;
   touch-action: pan-y pinch-zoom;
@@ -314,7 +315,7 @@ h2 {
 
 .screen-card {
   position: absolute;
-  width: min(320px, 72vw);
+  width: var(--carousel-card-width);
   border-radius: var(--radius-xl);
   background: rgba(36, 31, 43, 0.9);
   border: 1px solid rgba(232, 168, 124, 0.12);
@@ -521,11 +522,7 @@ h2 {
   }
 
   .screens-stage {
-    min-height: 500px;
-  }
-
-  .screen-current {
-    width: min(280px, 72vw);
+    --carousel-card-width: min(280px, 72vw);
   }
 
   .screen-prev,
@@ -569,7 +566,7 @@ h2 {
   }
 
   .screens-stage {
-    min-height: 430px;
+    --carousel-card-width: min(250px, 74vw);
   }
 
   .screen-prev,
