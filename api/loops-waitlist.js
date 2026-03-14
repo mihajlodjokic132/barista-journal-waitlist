@@ -25,7 +25,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const loopsRes = await fetch('https://app.loops.so/api/v1/contacts/import', {
+    const loopsRes = await fetch('https://app.loops.so/api/v1/contacts/create', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -33,9 +33,9 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         email,
-        name,
+        firstName: name,
         source: 'waitlist',
-        skill_level: skill,
+        skill,
       }),
     });
     const loopsText = await loopsRes.text();
