@@ -444,7 +444,7 @@ form?.addEventListener("submit", async (event) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${import.meta.env.LOOPS_API_KEY}`,
+          "Authorization": `Bearer ${import.meta.env.VITE_LOOPS_API_KEY}`,
         },
         body: JSON.stringify({
           email,
