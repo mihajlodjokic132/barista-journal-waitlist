@@ -1,6 +1,12 @@
+import { createClient } from "@supabase/supabase-js";
+
 const screensGrid = document.getElementById("screens-grid");
 const form = document.getElementById("waitlist-form");
 const messageEl = document.getElementById("form-message");
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
 if ("scrollRestoration" in history) {
   history.scrollRestoration = "manual";
@@ -385,13 +391,26 @@ function setMessage(text, type = "") {
   messageEl.className = `form-message ${type}`.trim();
 }
 
-form?.addEventListener("submit", (event) => {
+form?.addEventListener("submit", async (event) => {
   event.preventDefault();
+
+  if (!supabase) {
+    setMessage("Waitlist is not configured yet. Add Supabase env vars first.", "error");
+    return;
+  }
 
   const formData = new FormData(form);
   const name = String(formData.get("name") || "").trim();
-  const email = String(formData.get("email") || "").trim();
+  const email = String(formData.get("email") || "").trim().toLowerCase();
   const skill = String(formData.get("skill") || "").trim();
+  const website = String(formData.get("website") || "").trim();
+
+  // Honeypot check: real users should never fill this in.
+  if (website) {
+    setMessage("You are on the list. We will email you before launch.", "success");
+    form.reset();
+    return;
+  }
 
   if (!name || !email || !skill) {
     setMessage("Please complete all fields before joining.", "error");
@@ -404,15 +423,35 @@ form?.addEventListener("submit", (event) => {
     return;
   }
 
-  const waitlistEntries = JSON.parse(localStorage.getItem("baristaWaitlist") || "[]");
-  waitlistEntries.push({
+  const submitButton = form.querySelector('button[type="submit"]');
+  if (submitButton instanceof HTMLButtonElement) {
+    submitButton.disabled = true;
+    submitButton.textContent = "Joining...";
+  }
+
+  const { error } = await supabase.from("waitlist").insert({
     name,
     email,
-    skill,
-    createdAt: new Date().toISOString(),
+    skill_level: skill,
+    source: "landing-page",
   });
 
-  localStorage.setItem("baristaWaitlist", JSON.stringify(waitlistEntries));
+  if (submitButton instanceof HTMLButtonElement) {
+    submitButton.disabled = false;
+    submitButton.textContent = "Join the Waitlist";
+  }
+
+  if (error) {
+    const message = String(error.message || "").toLowerCase();
+    if (message.includes("duplicate") || message.includes("unique")) {
+      setMessage("This email is already on the waitlist.", "error");
+      return;
+    }
+
+    setMessage("Could not save your signup. Please try again.", "error");
+    return;
+  }
+
   form.reset();
   setMessage("You are on the list. We will email you before launch.", "success");
 });

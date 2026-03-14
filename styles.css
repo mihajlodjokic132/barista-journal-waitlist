@@ -276,6 +276,60 @@ h2 {
   text-transform: uppercase;
 }
 
+.why {
+  padding-bottom: var(--space-xxl);
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: var(--space-xl);
+  align-items: center;
+}
+
+.why-copy {
+  display: grid;
+  gap: 14px;
+}
+
+.why-list {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.why-list li {
+  color: var(--brew-text-secondary);
+  line-height: 1.55;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(232, 168, 124, 0.12);
+  background: rgba(36, 31, 43, 0.72);
+}
+
+.why-list strong {
+  color: var(--brew-text-primary);
+}
+
+.why-media {
+  display: grid;
+  justify-items: center;
+}
+
+.why-shot {
+  margin: 0;
+  width: min(320px, 74vw);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid rgba(232, 168, 124, 0.16);
+  background: rgba(36, 31, 43, 0.9);
+  box-shadow: var(--shadow-soft);
+}
+
+.why-shot img {
+  width: 100%;
+  display: block;
+}
+
 .screens {
   padding-top: var(--space-xl);
   padding-bottom: var(--space-xxl);
@@ -431,6 +485,14 @@ h2 {
   align-content: start;
 }
 
+.hp-field {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 .waitlist-form label {
   font-size: 0.86rem;
   color: var(--brew-text-secondary);
@@ -520,6 +582,10 @@ h2 {
   }
 
   .features {
+    grid-template-columns: 1fr;
+  }
+
+  .why {
     grid-template-columns: 1fr;
   }
 

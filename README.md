@@ -30,6 +30,20 @@ npm run preview
 - App screenshots are auto-loaded from assets/screenshots/ in filename order.
 - No HTML edits are needed when adding or removing screenshot files.
 
-## Notes
-- Waitlist submissions are currently stored in browser `localStorage` under `baristaWaitlist`.
-- Replace this with a backend endpoint when you are ready to collect real emails.
+## Real Waitlist (Supabase)
+1. Create a Supabase account and new project.
+2. In Supabase SQL Editor, run the script in supabase/waitlist.sql.
+3. In this project, create a local .env file based on .env.example.
+4. Fill:
+	- VITE_SUPABASE_URL
+	- VITE_SUPABASE_ANON_KEY
+5. Run the site:
+	- npm install
+	- npm run dev
+
+The waitlist form will then insert rows into the public.waitlist table.
+
+## Production env vars (Vercel)
+Add the same two variables in Vercel Project Settings -> Environment Variables:
+- VITE_SUPABASE_URL
+- VITE_SUPABASE_ANON_KEY
