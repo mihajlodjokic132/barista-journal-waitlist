@@ -71,6 +71,14 @@ function renderScreenshots() {
   nextImage.draggable = false;
   nextFigure.appendChild(nextImage);
 
+  const bufferFigure = document.createElement("figure");
+  bufferFigure.className = "screen-card screen-buffer";
+
+  const bufferImage = document.createElement("img");
+  bufferImage.loading = "lazy";
+  bufferImage.draggable = false;
+  bufferFigure.appendChild(bufferImage);
+
   const previousButton = document.createElement("button");
   previousButton.type = "button";
   previousButton.className = "screens-arrow screens-arrow-left";
@@ -88,7 +96,8 @@ function renderScreenshots() {
     return (index + total) % total;
   }
 
-  function updateSlideSources() {
+  function updateSlideSources(options = {}) {
+    const { fadeSides = false } = options;
     const current = screenshots[currentIndex];
     const previous = screenshots[wrapIndex(currentIndex - 1)];
     const next = screenshots[wrapIndex(currentIndex + 1)];
@@ -96,11 +105,28 @@ function renderScreenshots() {
     image.src = current.url;
     image.alt = `Barista Journal app screenshot ${currentIndex + 1}`;
 
-    previousImage.src = previous.url;
-    previousImage.alt = "Previous app screenshot preview";
+    if (!fadeSides) {
+      previousImage.src = previous.url;
+      previousImage.alt = "Previous app screenshot preview";
+      nextImage.src = next.url;
+      nextImage.alt = "Next app screenshot preview";
+      return;
+    }
 
-    nextImage.src = next.url;
-    nextImage.alt = "Next app screenshot preview";
+    previousImage.classList.add("fading");
+    nextImage.classList.add("fading");
+
+    window.setTimeout(() => {
+      previousImage.src = previous.url;
+      previousImage.alt = "Previous app screenshot preview";
+      nextImage.src = next.url;
+      nextImage.alt = "Next app screenshot preview";
+
+      requestAnimationFrame(() => {
+        previousImage.classList.remove("fading");
+        nextImage.classList.remove("fading");
+      });
+    }, 110);
   }
 
   function setCardStyle(card, x, scale, opacity, blur, zIndex) {
@@ -173,6 +199,42 @@ function renderScreenshots() {
     setCardStyle(nextFigure, spacing, sideVisual.scale, sideVisual.opacity, sideVisual.blur, 1);
   }
 
+  function prepareBuffer(direction) {
+    const stageWidth = stage.clientWidth || 640;
+    const spacing = Math.min(stageWidth * 0.34, 220);
+    const sideVisual = getVisualState(spacing, spacing);
+
+    if (direction < 0) {
+      const incomingPath = screenshots[wrapIndex(currentIndex + 2)].url;
+      bufferImage.src = incomingPath;
+      bufferImage.alt = "Incoming app screenshot preview";
+      setCardStyle(bufferFigure, spacing, sideVisual.scale, 0, sideVisual.blur, 1);
+      bufferFigure.classList.add("active");
+
+      requestAnimationFrame(() => {
+        setCardStyle(bufferFigure, spacing, sideVisual.scale, sideVisual.opacity, sideVisual.blur, 1);
+      });
+      return;
+    }
+
+    const incomingPath = screenshots[wrapIndex(currentIndex - 2)].url;
+    bufferImage.src = incomingPath;
+    bufferImage.alt = "Incoming app screenshot preview";
+    setCardStyle(bufferFigure, -spacing, sideVisual.scale, 0, sideVisual.blur, 1);
+    bufferFigure.classList.add("active");
+
+    requestAnimationFrame(() => {
+      setCardStyle(bufferFigure, -spacing, sideVisual.scale, sideVisual.opacity, sideVisual.blur, 1);
+    });
+  }
+
+  function clearBuffer() {
+    bufferFigure.classList.remove("active");
+    bufferFigure.style.opacity = "0";
+    bufferFigure.style.filter = "blur(3px) saturate(0.9) brightness(0.8)";
+    bufferFigure.style.zIndex = "0";
+  }
+
   function completeSlide(direction) {
     if (direction < 0) {
       currentIndex = wrapIndex(currentIndex + 1);
@@ -183,8 +245,9 @@ function renderScreenshots() {
     // Reset layout without animation to avoid a visible reverse motion.
     stage.classList.add("is-dragging");
     dragProgress = 0;
-    updateSlideSources();
+    updateSlideSources({ fadeSides: true });
     applyLayout(dragProgress);
+    clearBuffer();
 
     // Force style flush so removing the class does not animate the reset.
     void stage.offsetWidth;
@@ -196,6 +259,7 @@ function renderScreenshots() {
     if (isAnimating || screenshots.length < 2) return;
 
     isAnimating = true;
+    prepareBuffer(direction);
     applyArrowLayout(direction);
     window.setTimeout(() => {
       completeSlide(direction);
@@ -291,6 +355,7 @@ function renderScreenshots() {
   stage.appendChild(previousFigure);
   stage.appendChild(figure);
   stage.appendChild(nextFigure);
+  stage.appendChild(bufferFigure);
   stage.appendChild(previousButton);
   stage.appendChild(nextButton);
 

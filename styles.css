@@ -335,6 +335,16 @@ h2 {
   cursor: pointer;
 }
 
+.screen-buffer {
+  pointer-events: none;
+  opacity: 0;
+  z-index: 0;
+}
+
+.screen-buffer.active {
+  z-index: 1;
+}
+
 .screens-arrow {
   position: absolute;
   top: 50%;
@@ -372,6 +382,12 @@ h2 {
   pointer-events: none;
   user-select: none;
   -webkit-user-drag: none;
+  opacity: 1;
+  transition: opacity 180ms ease;
+}
+
+.screen-card img.fading {
+  opacity: 0;
 }
 
 .screens-empty {
