@@ -106,6 +106,10 @@ function renderScreenshots() {
   nextButton.setAttribute("aria-label", "Next screenshot");
   nextButton.textContent = ">";
 
+  function isMobileLayout() {
+    return window.matchMedia("(max-width: 580px)").matches;
+  }
+
   function wrapIndex(index) {
     const total = screenshots.length;
     return (index + total) % total;
@@ -257,6 +261,13 @@ function renderScreenshots() {
   function commit(direction) {
     if (isAnimating || screenshots.length < 2) return;
 
+    if (isMobileLayout()) {
+      currentIndex = direction < 0 ? wrapIndex(currentIndex + 1) : wrapIndex(currentIndex - 1);
+      updateSlideSources();
+      applyLayout(0);
+      return;
+    }
+
     isAnimating = true;
     prepareBuffer(direction);
     applyArrowLayout(direction);
@@ -298,8 +309,7 @@ function renderScreenshots() {
   nextFigure.addEventListener("click", goNext);
 
   stage.addEventListener("pointerdown", (event) => {
-    const isMobileLayout = window.matchMedia("(max-width: 580px)").matches;
-    if (isAnimating || !isMobileLayout) return;
+    if (isAnimating || !isMobileLayout()) return;
 
     event.preventDefault();
     activePointerId = event.pointerId;
@@ -315,10 +325,8 @@ function renderScreenshots() {
     event.preventDefault();
 
     const delta = event.clientX - dragStartX;
-    const stageWidth = stage.clientWidth || 640;
-
-    dragProgress = Math.max(-1, Math.min(1, delta / (stageWidth * 0.45)));
-    applyLayout(dragProgress);
+    // On mobile we only need direction/threshold, not animated dragging.
+    dragProgress = delta;
   });
 
   function handleDragEnd(event) {
@@ -328,15 +336,20 @@ function renderScreenshots() {
     activePointerId = null;
     stage.classList.remove("dragging");
 
-    if (dragProgress > mobileCommitThreshold) {
-      isAnimating = true;
-      snapTo(1, () => completeSlide(1));
-    } else if (dragProgress < -mobileCommitThreshold) {
-      isAnimating = true;
-      snapTo(-1, () => completeSlide(-1));
-    } else {
-      snapTo(0);
+    const stageWidth = stage.clientWidth || 640;
+    const dragRatio = dragProgress / (stageWidth * 0.45);
+
+    if (dragRatio > mobileCommitThreshold) {
+      currentIndex = wrapIndex(currentIndex - 1);
+      updateSlideSources();
+      applyLayout(0);
+    } else if (dragRatio < -mobileCommitThreshold) {
+      currentIndex = wrapIndex(currentIndex + 1);
+      updateSlideSources();
+      applyLayout(0);
     }
+
+    dragProgress = 0;
 
     if (typeof event.pointerId === "number" && stage.hasPointerCapture(event.pointerId)) {
       stage.releasePointerCapture(event.pointerId);

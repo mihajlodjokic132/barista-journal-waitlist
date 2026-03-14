@@ -580,6 +580,10 @@ h2 {
     display: none;
   }
 
+  .screen-card {
+    transition: none !important;
+  }
+
   .screens-arrow {
     width: 38px;
     height: 38px;
