@@ -52,6 +52,7 @@ function renderScreenshots() {
 
   const previousImage = document.createElement("img");
   previousImage.loading = "lazy";
+  previousImage.draggable = false;
   previousFigure.appendChild(previousImage);
 
   const figure = document.createElement("figure");
@@ -59,6 +60,7 @@ function renderScreenshots() {
 
   const image = document.createElement("img");
   image.loading = "lazy";
+  image.draggable = false;
   figure.appendChild(image);
 
   const nextFigure = document.createElement("figure");
@@ -66,6 +68,7 @@ function renderScreenshots() {
 
   const nextImage = document.createElement("img");
   nextImage.loading = "lazy";
+  nextImage.draggable = false;
   nextFigure.appendChild(nextImage);
 
   const hint = document.createElement("p");
@@ -99,6 +102,23 @@ function renderScreenshots() {
     card.style.zIndex = String(zIndex);
   }
 
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function lerp(start, end, t) {
+    return start + (end - start) * t;
+  }
+
+  function getVisualState(x, spacing) {
+    const distance = clamp(Math.abs(x) / spacing, 0, 1);
+    return {
+      scale: lerp(1, 0.9, distance),
+      opacity: lerp(1, 0.42, distance),
+      blur: lerp(0, 3, distance),
+    };
+  }
+
   function applyLayout(progress) {
     const stageWidth = stage.clientWidth || 640;
     const spacing = Math.min(stageWidth * 0.34, 220);
@@ -107,20 +127,13 @@ function renderScreenshots() {
     const currentX = progress * spacing;
     const nextX = spacing + progress * spacing;
 
-    const prevScale = 0.9 + Math.max(0, progress) * 0.1;
-    const currentScale = 1 - Math.abs(progress) * 0.1;
-    const nextScale = 0.9 + Math.max(0, -progress) * 0.1;
+    const previousVisual = getVisualState(prevX, spacing);
+    const currentVisual = getVisualState(currentX, spacing);
+    const nextVisual = getVisualState(nextX, spacing);
 
-    const prevOpacity = 0.42 + Math.max(0, progress) * 0.5;
-    const currentOpacity = 1 - Math.abs(progress) * 0.28;
-    const nextOpacity = 0.42 + Math.max(0, -progress) * 0.5;
-
-    const prevBlur = Math.max(0.4, 3 - Math.max(0, progress) * 2.6);
-    const nextBlur = Math.max(0.4, 3 - Math.max(0, -progress) * 2.6);
-
-    setCardStyle(previousFigure, prevX, prevScale, prevOpacity, prevBlur, 1);
-    setCardStyle(figure, currentX, currentScale, currentOpacity, 0, 3);
-    setCardStyle(nextFigure, nextX, nextScale, nextOpacity, nextBlur, 1);
+    setCardStyle(previousFigure, prevX, previousVisual.scale, previousVisual.opacity, previousVisual.blur, 1);
+    setCardStyle(figure, currentX, currentVisual.scale, currentVisual.opacity, currentVisual.blur, 3);
+    setCardStyle(nextFigure, nextX, nextVisual.scale, nextVisual.opacity, nextVisual.blur, 1);
   }
 
   function snapTo(targetProgress, onDone) {
@@ -183,6 +196,7 @@ function renderScreenshots() {
   stage.addEventListener("pointerdown", (event) => {
     if (isAnimating) return;
 
+    event.preventDefault();
     activePointerId = event.pointerId;
     dragStartX = event.clientX;
     isDragging = true;
@@ -192,6 +206,8 @@ function renderScreenshots() {
 
   stage.addEventListener("pointermove", (event) => {
     if (!isDragging || event.pointerId !== activePointerId) return;
+
+    event.preventDefault();
 
     const delta = event.clientX - dragStartX;
     const stageWidth = stage.clientWidth || 640;
@@ -224,6 +240,7 @@ function renderScreenshots() {
 
   stage.addEventListener("pointerup", handleDragEnd);
   stage.addEventListener("pointercancel", handleDragEnd);
+  stage.addEventListener("dragstart", (event) => event.preventDefault());
 
   window.addEventListener("resize", () => {
     applyLayout(dragProgress);
