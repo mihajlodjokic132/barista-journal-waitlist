@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Barista Journal | Espresso Better</title>
+    <meta
+      name="description"
+      content="Barista Journal helps home espresso enthusiasts track, learn, and improve every shot. Join the iOS waitlist."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="bg-grain" aria-hidden="true"></div>
+    <div class="bg-beans" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <a href="#" class="brand" aria-label="Barista Journal home">
+          <span class="brand-mark">Barista Journal</span>
+        </a>
+        <a href="#waitlist" class="btn btn-ghost">Join Waitlist</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero container">
+        <div class="hero-copy reveal-up">
+          <p class="eyebrow">iOS app for home espresso enthusiasts</p>
+          <h1>Dial in better shots, one brew at a time.</h1>
+          <p class="lead">
+            Track dose, yield, time, milk, and notes. Learn from trends, fix mistakes faster,
+            and build your best coffee routine with Barista Journal.
+          </p>
+          <div class="hero-cta">
+            <a href="#waitlist" class="btn btn-primary">Get Early Access</a>
+            <span class="subtext">5-day Pro trial at launch</span>
+          </div>
+          <ul class="quick-stats" aria-label="Product highlights">
+            <li><strong>13</strong><span>Drink types</span></li>
+            <li><strong>23</strong><span>Achievements</span></li>
+            <li><strong>Pro</strong><span>Shot diagnosis</span></li>
+          </ul>
+        </div>
+
+        <div class="hero-media reveal-up delay-1">
+          <div class="hero-media-glow" aria-hidden="true"></div>
+          <img
+            src="/assets/HeroImage.png"
+            alt="Barista Journal app preview on an iPhone"
+            class="hero-image"
+            loading="eager"
+          />
+        </div>
+      </section>
+
+      <section class="features container" id="features">
+        <article class="feature-card reveal-up delay-1">
+          <p class="feature-kicker">Track</p>
+          <h2>Every shot becomes usable data</h2>
+          <p>
+            Log dose, yield, grind, extraction, milk prep, and notes in one smooth brew flow.
+          </p>
+        </article>
+        <article class="feature-card reveal-up delay-2">
+          <p class="feature-kicker">Learn</p>
+          <h2>Built-in espresso education</h2>
+          <p>
+            Common mistakes, latte art basics, crema and grind guides, and practical fixes while
+            you brew.
+          </p>
+        </article>
+        <article class="feature-card reveal-up delay-3">
+          <p class="feature-kicker">Improve</p>
+          <h2>Spot trends and save money</h2>
+          <p>
+            Review consistency, costs, and bean performance over time so each week tastes better.
+          </p>
+        </article>
+      </section>
+
+      <section class="screens container reveal-up" id="screens">
+        <div class="section-head">
+          <p class="eyebrow">App preview</p>
+          <h2>Designed for focused coffee sessions</h2>
+        </div>
+        <div class="screens-grid">
+          <div class="screen-card">
+            <img src="/assets/HeroImage.png" alt="Barista Journal dashboard preview" loading="lazy" />
+          </div>
+          <div class="screen-card muted-card">
+            <p>Add app screenshots to:</p>
+            <code>assets/screenshots/</code>
+            <small>They will replace this placeholder area.</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="waitlist container reveal-up" id="waitlist">
+        <div class="waitlist-copy">
+          <p class="eyebrow">Waitlist</p>
+          <h2>Be first to pour with Barista Journal</h2>
+          <p>
+            Join early access for launch updates, onboarding invites, and occasional brewing tips.
+          </p>
+        </div>
+
+        <form class="waitlist-form" id="waitlist-form" novalidate>
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" autocomplete="name" placeholder="Mike" required />
+
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            autocomplete="email"
+            placeholder="you@example.com"
+            required
+          />
+
+          <label for="skill">Skill level</label>
+          <select id="skill" name="skill" required>
+            <option value="" selected disabled>Select your level</option>
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+
+          <button type="submit" class="btn btn-primary">Join the Waitlist</button>
+          <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer container">
+      <p>Barista Journal • iOS waitlist</p>
+    </footer>
+
+    <script type="module" src="/script.js"></script>
+  </body>
+</html>
