@@ -194,14 +194,14 @@ function renderScreenshots() {
     function showBufferAt(x) {
       // Start from hidden state, then immediately transition in without waiting a full frame.
       bufferFigure.style.transition = "none";
-      setCardStyle(bufferFigure, x, sideVisual.scale, 0, sideVisual.blur, 4);
+      setCardStyle(bufferFigure, x, sideVisual.scale, 0, sideVisual.blur, 1);
       bufferFigure.classList.add("active");
 
       // Force reflow so the browser applies the hidden state before transitioning.
       void bufferFigure.offsetWidth;
 
       bufferFigure.style.transition = "";
-      setCardStyle(bufferFigure, x, sideVisual.scale, sideVisual.opacity, sideVisual.blur, 4);
+      setCardStyle(bufferFigure, x, sideVisual.scale, sideVisual.opacity, sideVisual.blur, 1);
     }
 
     if (direction < 0) {
