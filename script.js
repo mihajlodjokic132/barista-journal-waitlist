@@ -191,28 +191,31 @@ function renderScreenshots() {
     const spacing = Math.min(stageWidth * 0.34, 220);
     const sideVisual = getVisualState(spacing, spacing);
 
+    function showBufferAt(x) {
+      // Start from hidden state, then immediately transition in without waiting a full frame.
+      bufferFigure.style.transition = "none";
+      setCardStyle(bufferFigure, x, sideVisual.scale, 0, sideVisual.blur, 1);
+      bufferFigure.classList.add("active");
+
+      // Force reflow so the browser applies the hidden state before transitioning.
+      void bufferFigure.offsetWidth;
+
+      bufferFigure.style.transition = "";
+      setCardStyle(bufferFigure, x, sideVisual.scale, sideVisual.opacity, sideVisual.blur, 1);
+    }
+
     if (direction < 0) {
       const incomingPath = screenshots[wrapIndex(currentIndex + 2)].url;
       bufferImage.src = incomingPath;
       bufferImage.alt = "Incoming app screenshot preview";
-      setCardStyle(bufferFigure, spacing, sideVisual.scale, 0, sideVisual.blur, 1);
-      bufferFigure.classList.add("active");
-
-      requestAnimationFrame(() => {
-        setCardStyle(bufferFigure, spacing, sideVisual.scale, sideVisual.opacity, sideVisual.blur, 1);
-      });
+      showBufferAt(spacing);
       return;
     }
 
     const incomingPath = screenshots[wrapIndex(currentIndex - 2)].url;
     bufferImage.src = incomingPath;
     bufferImage.alt = "Incoming app screenshot preview";
-    setCardStyle(bufferFigure, -spacing, sideVisual.scale, 0, sideVisual.blur, 1);
-    bufferFigure.classList.add("active");
-
-    requestAnimationFrame(() => {
-      setCardStyle(bufferFigure, -spacing, sideVisual.scale, sideVisual.opacity, sideVisual.blur, 1);
-    });
+    showBufferAt(-spacing);
   }
 
   function clearBuffer() {
