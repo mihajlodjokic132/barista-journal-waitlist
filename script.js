@@ -436,6 +436,31 @@ form?.addEventListener("submit", async (event) => {
     source: "landing-page",
   });
 
+  // Send to Loops API if Supabase insert succeeded
+  let loopsError = null;
+  if (!error) {
+    try {
+      const loopsRes = await fetch("https://app.loops.so/api/v1/contacts/import", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${import.meta.env.LOOPS_API_KEY}`,
+        },
+        body: JSON.stringify({
+          email,
+          name,
+          source: "waitlist",
+          skill_level: skill,
+        }),
+      });
+      if (!loopsRes.ok) {
+        loopsError = true;
+      }
+    } catch (e) {
+      loopsError = true;
+    }
+  }
+
   if (submitButton instanceof HTMLButtonElement) {
     submitButton.disabled = false;
     submitButton.textContent = "Join the Waitlist";
@@ -453,5 +478,9 @@ form?.addEventListener("submit", async (event) => {
   }
 
   form.reset();
-  setMessage("You are on the list. We will email you before launch.", "success");
+  if (loopsError) {
+    setMessage("You are on the list, but confirmation email could not be sent. Please contact support if you don't receive it.", "warning");
+  } else {
+    setMessage("You are on the list. We will email you before launch.", "success");
+  }
 });
