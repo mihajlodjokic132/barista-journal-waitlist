@@ -20,9 +20,14 @@ npm run build
 npm run preview
 ```
 
+## Deploy (GitHub Pages)
+- A GitHub Actions workflow is included at .github/workflows/deploy-pages.yml.
+- In GitHub repository settings, set Pages source to GitHub Actions.
+- Every push to main builds and deploys automatically.
+
 ## Assets
-- Hero image is loaded from `assets/HeroImage.png`.
-- Add additional app screenshots to `assets/screenshots/` and replace the placeholder card in the Screens section.
+- Hero image is loaded from assets/HeroImage.png.
+- App screenshots are loaded from assets/screenshots/ (screen-01.png through screen-08.png in the gallery section).
 
 ## Notes
 - Waitlist submissions are currently stored in browser `localStorage` under `baristaWaitlist`.
