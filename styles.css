@@ -382,12 +382,6 @@ h2 {
   pointer-events: none;
   user-select: none;
   -webkit-user-drag: none;
-  opacity: 1;
-  transition: opacity 180ms ease;
-}
-
-.screen-card img.fading {
-  opacity: 0;
 }
 
 .screens-empty {

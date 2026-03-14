@@ -21,6 +21,12 @@ function renderScreenshots() {
     .map(([path, url]) => ({ path, url: String(url) }))
     .sort((a, b) => getSortKey(a.path) - getSortKey(b.path) || a.path.localeCompare(b.path));
 
+  // Preload all screenshot assets to avoid blank/late side previews during transitions.
+  screenshots.forEach((item) => {
+    const preload = new Image();
+    preload.src = item.url;
+  });
+
   screensGrid.innerHTML = "";
 
   if (screenshots.length === 0) {
@@ -96,8 +102,7 @@ function renderScreenshots() {
     return (index + total) % total;
   }
 
-  function updateSlideSources(options = {}) {
-    const { fadeSides = false } = options;
+  function updateSlideSources() {
     const current = screenshots[currentIndex];
     const previous = screenshots[wrapIndex(currentIndex - 1)];
     const next = screenshots[wrapIndex(currentIndex + 1)];
@@ -105,28 +110,10 @@ function renderScreenshots() {
     image.src = current.url;
     image.alt = `Barista Journal app screenshot ${currentIndex + 1}`;
 
-    if (!fadeSides) {
-      previousImage.src = previous.url;
-      previousImage.alt = "Previous app screenshot preview";
-      nextImage.src = next.url;
-      nextImage.alt = "Next app screenshot preview";
-      return;
-    }
-
-    previousImage.classList.add("fading");
-    nextImage.classList.add("fading");
-
-    window.setTimeout(() => {
-      previousImage.src = previous.url;
-      previousImage.alt = "Previous app screenshot preview";
-      nextImage.src = next.url;
-      nextImage.alt = "Next app screenshot preview";
-
-      requestAnimationFrame(() => {
-        previousImage.classList.remove("fading");
-        nextImage.classList.remove("fading");
-      });
-    }, 110);
+    previousImage.src = previous.url;
+    previousImage.alt = "Previous app screenshot preview";
+    nextImage.src = next.url;
+    nextImage.alt = "Next app screenshot preview";
   }
 
   function setCardStyle(card, x, scale, opacity, blur, zIndex) {
@@ -245,7 +232,7 @@ function renderScreenshots() {
     // Reset layout without animation to avoid a visible reverse motion.
     stage.classList.add("is-dragging");
     dragProgress = 0;
-    updateSlideSources({ fadeSides: true });
+    updateSlideSources();
     applyLayout(dragProgress);
     clearBuffer();
 
