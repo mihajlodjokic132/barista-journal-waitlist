@@ -27,7 +27,8 @@ npm run preview
 
 ## Assets
 - Hero image is loaded from assets/HeroImage.png.
-- App screenshots are loaded from assets/screenshots/ (screen-01.png through screen-08.png in the gallery section).
+- App screenshots are auto-loaded from assets/screenshots/ in filename order.
+- No HTML edits are needed when adding or removing screenshot files.
 
 ## Notes
 - Waitlist submissions are currently stored in browser `localStorage` under `baristaWaitlist`.
