@@ -31,18 +31,79 @@ function renderScreenshots() {
     return;
   }
 
-  screenshots.forEach((item, index) => {
-    const figure = document.createElement("figure");
-    figure.className = "screen-card";
+  let currentIndex = 0;
 
-    const image = document.createElement("img");
-    image.src = item.url;
-    image.alt = `Barista Journal app screenshot ${index + 1}`;
-    image.loading = "lazy";
+  const carousel = document.createElement("div");
+  carousel.className = "screens-carousel";
 
-    figure.appendChild(image);
-    screensGrid.appendChild(figure);
+  const figure = document.createElement("figure");
+  figure.className = "screen-card";
+
+  const image = document.createElement("img");
+  image.loading = "lazy";
+  figure.appendChild(image);
+
+  const controls = document.createElement("div");
+  controls.className = "screens-controls";
+
+  const prevButton = document.createElement("button");
+  prevButton.type = "button";
+  prevButton.className = "screens-nav";
+  prevButton.textContent = "<";
+  prevButton.setAttribute("aria-label", "Previous screenshot");
+
+  const counter = document.createElement("p");
+  counter.className = "screens-counter";
+  counter.setAttribute("aria-live", "polite");
+
+  const nextButton = document.createElement("button");
+  nextButton.type = "button";
+  nextButton.className = "screens-nav";
+  nextButton.textContent = ">";
+  nextButton.setAttribute("aria-label", "Next screenshot");
+
+  function updateSlide() {
+    const current = screenshots[currentIndex];
+    image.src = current.url;
+    image.alt = `Barista Journal app screenshot ${currentIndex + 1}`;
+    counter.textContent = `${currentIndex + 1} / ${screenshots.length}`;
+  }
+
+  function goPrevious() {
+    currentIndex = (currentIndex - 1 + screenshots.length) % screenshots.length;
+    updateSlide();
+  }
+
+  function goNext() {
+    currentIndex = (currentIndex + 1) % screenshots.length;
+    updateSlide();
+  }
+
+  prevButton.addEventListener("click", goPrevious);
+  nextButton.addEventListener("click", goNext);
+
+  carousel.tabIndex = 0;
+  carousel.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      goPrevious();
+    }
+
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      goNext();
+    }
   });
+
+  controls.appendChild(prevButton);
+  controls.appendChild(counter);
+  controls.appendChild(nextButton);
+
+  carousel.appendChild(figure);
+  carousel.appendChild(controls);
+  screensGrid.appendChild(carousel);
+
+  updateSlide();
 }
 
 renderScreenshots();
