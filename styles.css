@@ -271,6 +271,7 @@ h2 {
 }
 
 .screens {
+  padding-top: var(--space-xl);
   padding-bottom: var(--space-xxl);
 }
 
