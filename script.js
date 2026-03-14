@@ -153,6 +153,26 @@ function renderScreenshots() {
     }, snapDurationMs);
   }
 
+  function applyArrowLayout(direction) {
+    const stageWidth = stage.clientWidth || 640;
+    const spacing = Math.min(stageWidth * 0.34, 220);
+    const sideVisual = getVisualState(spacing, spacing);
+    const centerVisual = getVisualState(0, spacing);
+
+    if (direction < 0) {
+      // Next: right preview moves to center, left preview stays left.
+      setCardStyle(previousFigure, -spacing, sideVisual.scale, sideVisual.opacity, sideVisual.blur, 1);
+      setCardStyle(figure, -spacing, sideVisual.scale, sideVisual.opacity, sideVisual.blur, 2);
+      setCardStyle(nextFigure, 0, centerVisual.scale, centerVisual.opacity, centerVisual.blur, 3);
+      return;
+    }
+
+    // Previous: left preview moves to center, right preview stays right.
+    setCardStyle(previousFigure, 0, centerVisual.scale, centerVisual.opacity, centerVisual.blur, 3);
+    setCardStyle(figure, spacing, sideVisual.scale, sideVisual.opacity, sideVisual.blur, 2);
+    setCardStyle(nextFigure, spacing, sideVisual.scale, sideVisual.opacity, sideVisual.blur, 1);
+  }
+
   function completeSlide(direction) {
     if (direction < 0) {
       currentIndex = wrapIndex(currentIndex + 1);
@@ -176,7 +196,10 @@ function renderScreenshots() {
     if (isAnimating || screenshots.length < 2) return;
 
     isAnimating = true;
-    snapTo(direction, () => completeSlide(direction));
+    applyArrowLayout(direction);
+    window.setTimeout(() => {
+      completeSlide(direction);
+    }, snapDurationMs);
   }
 
   function goPrevious() {
