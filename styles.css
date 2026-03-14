@@ -286,10 +286,24 @@ h2 {
 }
 
 .screens-carousel {
-  width: min(420px, 100%);
+  width: min(720px, 100%);
   display: grid;
   gap: 12px;
-  outline: none;
+}
+
+.screens-stage {
+  position: relative;
+  min-height: 560px;
+  display: grid;
+  place-items: center;
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  --drag-offset: 0px;
+}
+
+.screens-stage.dragging {
+  cursor: grabbing;
 }
 
 .screen-card {
@@ -302,42 +316,46 @@ h2 {
   margin: 0;
 }
 
+.screen-current {
+  width: min(320px, 72vw);
+  z-index: 3;
+  transform: translateX(calc(var(--drag-offset) * 0.07));
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.screen-side {
+  position: absolute;
+  top: 50%;
+  width: min(230px, 45vw);
+  opacity: 0.55;
+  filter: blur(3px) saturate(0.8) brightness(0.72);
+  z-index: 1;
+  pointer-events: none;
+  border-color: rgba(154, 147, 168, 0.18);
+}
+
+.screen-side-left {
+  left: 0;
+  transform: translate(-28%, -50%) scale(0.95);
+}
+
+.screen-side-right {
+  right: 0;
+  transform: translate(28%, -50%) scale(0.95);
+}
+
 .screen-card img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.screens-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-}
-
-.screens-nav {
-  border: 1px solid rgba(232, 168, 124, 0.25);
-  background: rgba(212, 132, 90, 0.12);
-  color: var(--brew-accent-light);
-  border-radius: var(--radius-full);
-  width: 36px;
-  height: 36px;
-  font-size: 1.2rem;
-  font-weight: 800;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.screens-nav:hover {
-  background: rgba(212, 132, 90, 0.2);
-}
-
-.screens-counter {
+.screens-hint {
   margin: 0;
-  min-width: 86px;
   text-align: center;
   color: var(--brew-text-secondary);
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .screens-empty {
@@ -472,7 +490,19 @@ h2 {
   }
 
   .screens-carousel {
-    width: min(360px, 100%);
+    width: min(520px, 100%);
+  }
+
+  .screens-stage {
+    min-height: 500px;
+  }
+
+  .screen-current {
+    width: min(280px, 72vw);
+  }
+
+  .screen-side {
+    width: min(180px, 34vw);
   }
 
   .waitlist {
@@ -500,5 +530,17 @@ h2 {
 
   .hero-cta {
     display: grid;
+  }
+
+  .screens-stage {
+    min-height: 430px;
+  }
+
+  .screen-side {
+    display: none;
+  }
+
+  .screens-hint {
+    font-size: 0.86rem;
   }
 }

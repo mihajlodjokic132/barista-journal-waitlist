@@ -32,58 +32,72 @@ function renderScreenshots() {
   }
 
   let currentIndex = 0;
+  let dragStartX = 0;
+  let isDragging = false;
 
   const carousel = document.createElement("div");
   carousel.className = "screens-carousel";
 
+  const stage = document.createElement("div");
+  stage.className = "screens-stage";
+  stage.tabIndex = 0;
+
+  const previousFigure = document.createElement("figure");
+  previousFigure.className = "screen-card screen-side screen-side-left";
+
+  const previousImage = document.createElement("img");
+  previousImage.loading = "lazy";
+  previousFigure.appendChild(previousImage);
+
   const figure = document.createElement("figure");
-  figure.className = "screen-card";
+  figure.className = "screen-card screen-current";
 
   const image = document.createElement("img");
   image.loading = "lazy";
   figure.appendChild(image);
 
-  const controls = document.createElement("div");
-  controls.className = "screens-controls";
+  const nextFigure = document.createElement("figure");
+  nextFigure.className = "screen-card screen-side screen-side-right";
 
-  const prevButton = document.createElement("button");
-  prevButton.type = "button";
-  prevButton.className = "screens-nav";
-  prevButton.textContent = "<";
-  prevButton.setAttribute("aria-label", "Previous screenshot");
+  const nextImage = document.createElement("img");
+  nextImage.loading = "lazy";
+  nextFigure.appendChild(nextImage);
 
-  const counter = document.createElement("p");
-  counter.className = "screens-counter";
-  counter.setAttribute("aria-live", "polite");
+  const hint = document.createElement("p");
+  hint.className = "screens-hint";
+  hint.textContent = "Drag left or right to browse";
 
-  const nextButton = document.createElement("button");
-  nextButton.type = "button";
-  nextButton.className = "screens-nav";
-  nextButton.textContent = ">";
-  nextButton.setAttribute("aria-label", "Next screenshot");
+  function wrapIndex(index) {
+    const total = screenshots.length;
+    return (index + total) % total;
+  }
 
   function updateSlide() {
     const current = screenshots[currentIndex];
+    const previous = screenshots[wrapIndex(currentIndex - 1)];
+    const next = screenshots[wrapIndex(currentIndex + 1)];
+
     image.src = current.url;
     image.alt = `Barista Journal app screenshot ${currentIndex + 1}`;
-    counter.textContent = `${currentIndex + 1} / ${screenshots.length}`;
+
+    previousImage.src = previous.url;
+    previousImage.alt = "Previous app screenshot preview";
+
+    nextImage.src = next.url;
+    nextImage.alt = "Next app screenshot preview";
   }
 
   function goPrevious() {
-    currentIndex = (currentIndex - 1 + screenshots.length) % screenshots.length;
+    currentIndex = wrapIndex(currentIndex - 1);
     updateSlide();
   }
 
   function goNext() {
-    currentIndex = (currentIndex + 1) % screenshots.length;
+    currentIndex = wrapIndex(currentIndex + 1);
     updateSlide();
   }
 
-  prevButton.addEventListener("click", goPrevious);
-  nextButton.addEventListener("click", goNext);
-
-  carousel.tabIndex = 0;
-  carousel.addEventListener("keydown", (event) => {
+  stage.addEventListener("keydown", (event) => {
     if (event.key === "ArrowLeft") {
       event.preventDefault();
       goPrevious();
@@ -95,12 +109,45 @@ function renderScreenshots() {
     }
   });
 
-  controls.appendChild(prevButton);
-  controls.appendChild(counter);
-  controls.appendChild(nextButton);
+  stage.addEventListener("pointerdown", (event) => {
+    dragStartX = event.clientX;
+    isDragging = true;
+    stage.classList.add("dragging");
+    stage.setPointerCapture(event.pointerId);
+  });
 
-  carousel.appendChild(figure);
-  carousel.appendChild(controls);
+  stage.addEventListener("pointermove", (event) => {
+    if (!isDragging) return;
+    const delta = event.clientX - dragStartX;
+    stage.style.setProperty("--drag-offset", `${delta}px`);
+  });
+
+  function handleDragEnd(event) {
+    if (!isDragging) return;
+
+    const delta = event.clientX - dragStartX;
+    const threshold = 55;
+
+    isDragging = false;
+    stage.classList.remove("dragging");
+    stage.style.setProperty("--drag-offset", "0px");
+
+    if (delta > threshold) {
+      goPrevious();
+    } else if (delta < -threshold) {
+      goNext();
+    }
+  }
+
+  stage.addEventListener("pointerup", handleDragEnd);
+  stage.addEventListener("pointercancel", handleDragEnd);
+
+  stage.appendChild(previousFigure);
+  stage.appendChild(figure);
+  stage.appendChild(nextFigure);
+
+  carousel.appendChild(stage);
+  carousel.appendChild(hint);
   screensGrid.appendChild(carousel);
 
   updateSlide();
