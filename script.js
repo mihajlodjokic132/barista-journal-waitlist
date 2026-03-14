@@ -173,17 +173,17 @@ function renderScreenshots() {
     const centerVisual = getVisualState(0, spacing);
 
     if (direction < 0) {
-      // Next: right preview moves to center, left preview stays left.
-      setCardStyle(previousFigure, -spacing, sideVisual.scale, sideVisual.opacity, sideVisual.blur, 1);
+      // Next: right preview moves to center, opposite (left) side fades out immediately.
+      setCardStyle(previousFigure, -spacing, sideVisual.scale, 0, sideVisual.blur, 1);
       setCardStyle(figure, -spacing, sideVisual.scale, sideVisual.opacity, sideVisual.blur, 2);
       setCardStyle(nextFigure, 0, centerVisual.scale, centerVisual.opacity, centerVisual.blur, 3);
       return;
     }
 
-    // Previous: left preview moves to center, right preview stays right.
+    // Previous: left preview moves to center, opposite (right) side fades out immediately.
     setCardStyle(previousFigure, 0, centerVisual.scale, centerVisual.opacity, centerVisual.blur, 3);
     setCardStyle(figure, spacing, sideVisual.scale, sideVisual.opacity, sideVisual.blur, 2);
-    setCardStyle(nextFigure, spacing, sideVisual.scale, sideVisual.opacity, sideVisual.blur, 1);
+    setCardStyle(nextFigure, spacing, sideVisual.scale, 0, sideVisual.blur, 1);
   }
 
   function prepareBuffer(direction) {
