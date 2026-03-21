@@ -54,6 +54,7 @@ body {
   min-height: 100svh;
   min-height: 100dvh;
   overflow-x: hidden;
+  position: relative;
 }
 
 body {
@@ -167,8 +168,9 @@ h4,
 }
 
 .site-tint {
-  position: fixed;
+  position: absolute;
   inset: 0;
+  min-height: 100%;
   pointer-events: none;
   z-index: 2;
   background: var(--bg-darken-color, #000000);
