@@ -4,6 +4,432 @@ const screensGrid = document.getElementById("screens-grid");
 const form = document.getElementById("waitlist-form");
 const messageEl = document.getElementById("form-message");
 
+function setupTailoredAtmosphere() {
+  const body = document.body;
+  const particles = Array.from(document.querySelectorAll(".tailored-particle"));
+  const controlsRoot = document.getElementById("tailored-controls");
+  const motionControl = document.getElementById("control-motion");
+  const lagControl = document.getElementById("control-lag");
+  const lightControl = document.getElementById("control-light");
+  const wobbleControl = document.getElementById("control-wobble");
+  const twinkleControl = document.getElementById("control-twinkle");
+  const scrollControl = document.getElementById("control-scroll");
+  const breatheDistanceControl = document.getElementById("control-breathe-distance");
+  const breatheSpeedControl = document.getElementById("control-breathe-speed");
+  const bgDarkenControl = document.getElementById("control-bg-darken");
+  const bgColorControl = document.getElementById("control-bg-color");
+  const glassControl = document.getElementById("control-glass");
+  const frostControl = document.getElementById("control-frost");
+  const fontControl = document.getElementById("control-font");
+  const resetButton = document.getElementById("control-reset");
+  const valueMotion = document.getElementById("value-motion");
+  const valueLag = document.getElementById("value-lag");
+  const valueLight = document.getElementById("value-light");
+  const valueWobble = document.getElementById("value-wobble");
+  const valueTwinkle = document.getElementById("value-twinkle");
+  const valueScroll = document.getElementById("value-scroll");
+  const valueBreatheDistance = document.getElementById("value-breathe-distance");
+  const valueBreatheSpeed = document.getElementById("value-breathe-speed");
+  const valueBgDarken = document.getElementById("value-bg-darken");
+  const valueBgColor = document.getElementById("value-bg-color");
+  const valueGlass = document.getElementById("value-glass");
+  const valueFrost = document.getElementById("value-frost");
+  const valueFont = document.getElementById("value-font");
+
+  const fontStorageKey = "barista-journal-font-preset";
+  const allowedFontPresets = new Set(["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]);
+  const fontPresetNames = {
+    "1": "Copper Classic",
+    "2": "Editorial Night",
+    "3": "Luxury Modern",
+    "4": "Gallery Serif",
+    "5": "Heritage Journal",
+    "6": "Boutique Sans",
+    "7": "Contrast Studio",
+    "8": "Runway Grid",
+    "9": "Soft Prestige",
+    "10": "Vintage Reserve",
+  };
+  let fontPreset = "1";
+
+  const storedFont = window.localStorage.getItem(fontStorageKey);
+  if (storedFont && allowedFontPresets.has(storedFont)) {
+    fontPreset = storedFont;
+  } else if (allowedFontPresets.has(body.dataset.fontPreset || "")) {
+    fontPreset = String(body.dataset.fontPreset);
+  }
+
+  const storageKey = "barista-journal-fx-effects";
+  const modeDefaults = {
+    creative: {
+      motion: true,
+      lag: 0.04,
+      light: 0.20,
+      wobble: 0,
+      twinkle: 0.05,
+      scroll: 0.90,
+      breatheDistance: 2.0,
+      breatheSpeed: 10.9,
+      bgDarken: 0.31,
+      bgColor: "#000000",
+      glass: "frosted",
+      frost: 1.15,
+    },
+    tailored: {
+      motion: true,
+      lag: 0.065,
+      light: 1,
+      wobble: 1,
+      twinkle: 1,
+      scroll: 0.35,
+      breatheDistance: 3,
+      breatheSpeed: 6.8,
+      bgDarken: 0.06,
+      bgColor: "#000000",
+      glass: "frosted",
+      frost: 1,
+    },
+  };
+
+  const defaults = {
+    motion: true,
+    lag: 0.04,
+    light: 0.20,
+    wobble: 0,
+    twinkle: 0.05,
+    scroll: 0.90,
+    breatheDistance: 3,
+    breatheSpeed: 6.8,
+    bgDarken: 0.08,
+    bgColor: "#000000",
+    glass: "frosted",
+    frost: 1,
+  };
+
+  let settings = { ...defaults };
+  let currentMode = body.dataset.siteStyle === "creative" ? "creative" : "tailored";
+
+  if (controlsRoot) {
+    controlsRoot.hidden = true;
+  }
+
+  const particleDepths = [0.28, 0.36, 0.31, 0.42, 0.34, 0.48, 0.26, 0.4, 0.52];
+  let pointerX = window.innerWidth * 0.52;
+  let pointerY = window.innerHeight * 0.24;
+  let smoothX = pointerX;
+  let smoothY = pointerY;
+  let frameId = 0;
+  let isRunning = false;
+
+  function persistSettings() {
+    let allSettings = {};
+    try {
+      const stored = window.localStorage.getItem(storageKey);
+      if (stored) {
+        allSettings = JSON.parse(stored);
+      }
+    } catch {
+      allSettings = {};
+    }
+
+    allSettings[currentMode] = settings;
+    window.localStorage.setItem(storageKey, JSON.stringify(allSettings));
+  }
+
+  function syncControls() {
+    if (motionControl) motionControl.checked = Boolean(settings.motion);
+    if (lagControl) lagControl.value = String(settings.lag);
+    if (lightControl) lightControl.value = String(settings.light);
+    if (wobbleControl) wobbleControl.value = String(settings.wobble);
+    if (twinkleControl) twinkleControl.value = String(settings.twinkle);
+    if (scrollControl) scrollControl.value = String(settings.scroll);
+    if (breatheDistanceControl) breatheDistanceControl.value = String(settings.breatheDistance);
+    if (breatheSpeedControl) breatheSpeedControl.value = String(settings.breatheSpeed);
+    if (bgDarkenControl) bgDarkenControl.value = String(settings.bgDarken ?? 0.08);
+    if (bgColorControl) bgColorControl.value = String(settings.bgColor || "#000000");
+    if (glassControl) glassControl.value = settings.glass || "frosted";
+    if (frostControl) frostControl.value = String(settings.frost ?? 1);
+    if (fontControl) fontControl.value = fontPreset;
+    updateReadouts();
+  }
+
+  function formatNumber(value, digits = 2) {
+    return Number(value).toFixed(digits);
+  }
+
+  function getRenderedTitleFont() {
+    const sampleHeading = document.querySelector(".feature-card h2") || document.querySelector("h1");
+    if (!sampleHeading) return "unknown";
+    const family = window.getComputedStyle(sampleHeading).fontFamily || "unknown";
+    const firstFamily = family.split(",")[0]?.trim().replace(/^['\"]|['\"]$/g, "") || "unknown";
+    return firstFamily;
+  }
+
+  function updateReadouts() {
+    if (valueMotion) valueMotion.textContent = settings.motion ? "On" : "Off";
+    if (valueLag) valueLag.textContent = formatNumber(settings.lag, 3);
+    if (valueLight) valueLight.textContent = formatNumber(settings.light, 2);
+    if (valueWobble) valueWobble.textContent = formatNumber(settings.wobble, 2);
+    if (valueTwinkle) valueTwinkle.textContent = formatNumber(settings.twinkle, 2);
+    if (valueScroll) valueScroll.textContent = formatNumber(settings.scroll, 2);
+    if (valueBreatheDistance) valueBreatheDistance.textContent = `${formatNumber(settings.breatheDistance, 1)}px`;
+    if (valueBreatheSpeed) valueBreatheSpeed.textContent = `${formatNumber(settings.breatheSpeed, 1)}s`;
+    if (valueBgDarken) valueBgDarken.textContent = `${Math.round((settings.bgDarken ?? 0) * 100)}%`;
+    if (valueBgColor) valueBgColor.textContent = String(settings.bgColor || "#000000").toUpperCase();
+    if (valueGlass) valueGlass.textContent = settings.glass === "clear" ? "Clear" : "Frosted";
+    if (valueFrost) valueFrost.textContent = formatNumber(settings.frost ?? 1, 2);
+    if (valueFont) {
+      const rendered = getRenderedTitleFont();
+      valueFont.textContent = `${fontPreset} - ${fontPresetNames[fontPreset] || "Custom"} (${rendered})`;
+    }
+  }
+
+  function applySettingsToCss() {
+    body.dataset.fontPreset = fontPreset;
+    body.dataset.tailoredMotion = settings.motion ? "on" : "off";
+    body.style.setProperty("--tailored-light-strength", settings.light.toFixed(2));
+    body.style.setProperty("--tailored-breathe-distance", `${settings.breatheDistance.toFixed(1)}px`);
+    body.style.setProperty("--tailored-breathe-speed", `${settings.breatheSpeed.toFixed(2)}s`);
+    body.style.setProperty("--tailored-particle-size", `${(7 + settings.wobble * 2).toFixed(2)}px`);
+    body.style.setProperty("--bg-darken-opacity", String(Math.max(0, Math.min(0.8, Number(settings.bgDarken ?? 0)))));
+    body.style.setProperty("--bg-darken-color", String(settings.bgColor || "#000000"));
+
+    const glassMode = settings.glass === "clear" ? "clear" : "frosted";
+    const frost = Math.max(0, Number(settings.frost ?? 1));
+    const glassOpacity = glassMode === "clear" ? 0.16 : 0.34 + (frost * 0.12);
+    const glassBlur = glassMode === "clear" ? 0 : 8 + (frost * 8);
+    const glassSat = glassMode === "clear" ? 100 : 108 + (frost * 12);
+    const glassBorder = glassMode === "clear" ? 0.16 : 0.2;
+
+    body.style.setProperty("--glass-bg-opacity", String(glassOpacity));
+    body.style.setProperty("--glass-blur", `${glassBlur}px`);
+    body.style.setProperty("--glass-sat", `${glassSat}%`);
+    body.style.setProperty("--glass-border-alpha", String(glassBorder));
+    body.style.setProperty("--glass-frost-level", String(frost));
+
+    if (!settings.motion) {
+      particles.forEach((particle) => {
+        particle.style.opacity = "0.4";
+        particle.style.transform = "translate3d(0, 0, 0)";
+      });
+    }
+  }
+
+  function loadModeSettings(mode) {
+    currentMode = mode === "creative" ? "creative" : "tailored";
+    settings = { ...(modeDefaults[currentMode] || defaults) };
+
+    try {
+      const stored = window.localStorage.getItem(storageKey);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        settings = { ...settings, ...(parsed[currentMode] || {}) };
+      }
+    } catch {
+      settings = { ...(modeDefaults[currentMode] || defaults) };
+    }
+
+    syncControls();
+    applySettingsToCss();
+    if (settings.motion) {
+      startLoop();
+    } else {
+      stopLoop();
+    }
+  }
+
+  function stopLoop() {
+    if (!isRunning) return;
+    window.cancelAnimationFrame(frameId);
+    isRunning = false;
+  }
+
+  function startLoop() {
+    if (isRunning || !settings.motion) return;
+    frameId = window.requestAnimationFrame(render);
+    isRunning = true;
+  }
+
+  function applyPointer(x, y) {
+    const px = (x / Math.max(window.innerWidth, 1)) * 100;
+    const py = (y / Math.max(window.innerHeight, 1)) * 100;
+    body.style.setProperty("--pointer-x", `${px.toFixed(2)}%`);
+    body.style.setProperty("--pointer-y", `${py.toFixed(2)}%`);
+  }
+
+  function render(now) {
+    if (!settings.motion) {
+      stopLoop();
+      return;
+    }
+
+    smoothX += (pointerX - smoothX) * settings.lag;
+    smoothY += (pointerY - smoothY) * settings.lag;
+    applyPointer(smoothX, smoothY);
+
+    const scrollY = window.scrollY || 0;
+
+    particles.forEach((particle, index) => {
+      const depth = particleDepths[index % particleDepths.length];
+      const wobbleX = Math.sin(now * 0.0012 + index * 1.4) * (14 + index * 0.5) * settings.wobble;
+      const wobbleY = Math.cos(now * 0.001 + index * 1.1) * (11 + index * 0.35) * settings.wobble;
+      const scrollOffset = -scrollY * depth * settings.scroll;
+      const twinkle = 0.24 + ((Math.sin(now * 0.0022 + index * 0.8) + 1) * 0.34 * settings.twinkle);
+
+      particle.style.transform = `translate3d(${wobbleX.toFixed(2)}px, ${(wobbleY + scrollOffset).toFixed(2)}px, 0)`;
+      particle.style.opacity = Math.min(1, twinkle).toFixed(2);
+    });
+
+    frameId = window.requestAnimationFrame(render);
+    isRunning = true;
+  }
+
+  window.addEventListener("pointermove", (event) => {
+    pointerX = event.clientX;
+    pointerY = event.clientY;
+  });
+
+  window.addEventListener("resize", () => {
+    pointerX = Math.min(pointerX, window.innerWidth);
+    pointerY = Math.min(pointerY, window.innerHeight);
+  });
+
+  applyPointer(pointerX, pointerY);
+
+  function bindControl(control, key, parser = Number) {
+    if (!control) return;
+    control.addEventListener("input", () => {
+      settings[key] = parser(control.value);
+      applySettingsToCss();
+      persistSettings();
+      updateReadouts();
+
+      if (settings.motion) {
+        startLoop();
+      }
+    });
+  }
+
+  if (motionControl) {
+    motionControl.addEventListener("change", () => {
+      settings.motion = motionControl.checked;
+      applySettingsToCss();
+      persistSettings();
+      updateReadouts();
+
+      if (settings.motion) {
+        startLoop();
+      } else {
+        stopLoop();
+      }
+    });
+  }
+
+  bindControl(lagControl, "lag");
+  bindControl(lightControl, "light");
+  bindControl(wobbleControl, "wobble");
+  bindControl(twinkleControl, "twinkle");
+  bindControl(scrollControl, "scroll");
+  bindControl(breatheDistanceControl, "breatheDistance");
+  bindControl(breatheSpeedControl, "breatheSpeed");
+  bindControl(bgDarkenControl, "bgDarken");
+  bindControl(glassControl, "glass", (value) => (value === "clear" ? "clear" : "frosted"));
+  bindControl(frostControl, "frost");
+
+  if (bgColorControl) {
+    bgColorControl.addEventListener("input", () => {
+      settings.bgColor = String(bgColorControl.value || "#000000");
+      applySettingsToCss();
+      persistSettings();
+      updateReadouts();
+    });
+  }
+
+  if (fontControl) {
+    fontControl.addEventListener("change", () => {
+      const next = String(fontControl.value);
+      if (!allowedFontPresets.has(next)) return;
+
+      fontPreset = next;
+      window.localStorage.setItem(fontStorageKey, fontPreset);
+      applySettingsToCss();
+      updateReadouts();
+    });
+  }
+
+  if (resetButton) {
+    resetButton.addEventListener("click", () => {
+      settings = { ...(modeDefaults[currentMode] || defaults) };
+      syncControls();
+      applySettingsToCss();
+      persistSettings();
+      window.localStorage.setItem(fontStorageKey, fontPreset);
+      updateReadouts();
+      startLoop();
+    });
+  }
+
+  const modeButtons = Array.from(document.querySelectorAll(".style-btn[data-site-style]"));
+  modeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const mode = button.dataset.siteStyle;
+      if (mode === "creative" || mode === "tailored") {
+        loadModeSettings(mode);
+      }
+    });
+  });
+
+  loadModeSettings(currentMode);
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      stopLoop();
+      return;
+    }
+
+    startLoop();
+  });
+}
+
+function setupShowcaseSwitcher() {
+  const switchButtons = Array.from(document.querySelectorAll(".style-btn[data-site-style]"));
+  if (switchButtons.length === 0) {
+    return;
+  }
+
+  const body = document.body;
+  const storageKey = "barista-journal-site-style";
+  const availableStyles = new Set(["creative", "fashion", "tailored"]);
+
+  function setView(view, persist = true) {
+    if (!availableStyles.has(view)) return;
+
+    body.dataset.siteStyle = view;
+
+    switchButtons.forEach((button) => {
+      const isActive = button.dataset.siteStyle === view;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+
+    if (persist) {
+      window.localStorage.setItem(storageKey, view);
+    }
+  }
+
+  switchButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const nextView = button.dataset.siteStyle;
+      if (!nextView) return;
+      setView(nextView);
+    });
+  });
+
+  const stored = window.localStorage.getItem(storageKey);
+  const initialView = stored && availableStyles.has(stored) ? stored : body.dataset.siteStyle || "tailored";
+  setView(initialView, false);
+}
+
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabase = supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
@@ -385,6 +811,8 @@ function renderScreenshots() {
 }
 
 renderScreenshots();
+setupShowcaseSwitcher();
+setupTailoredAtmosphere();
 
 function setMessage(text, type = "") {
   messageEl.textContent = text;

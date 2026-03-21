@@ -31,7 +31,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Bodoni+Moda:opsz,wght@6..96,500;700&family=Cinzel:wght@500;700&family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;700&family=DM+Serif+Display:ital@0;1&family=Fraunces:opsz,wght@9..144,400;600;700&family=Libre+Baskerville:wght@400;700&family=Lora:wght@400;600;700&family=Manrope:wght@400;500;600;700;800&family=Marcellus&family=Outfit:wght@400;500;700&family=Playfair+Display:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Prata&family=Sora:wght@400;600;700&family=Space+Grotesk:wght@500;700&family=Syne:wght@500;700&family=Unbounded:wght@500;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
@@ -50,9 +54,24 @@
       }
     </script>
   </head>
-  <body>
+  <body data-site-style="creative" data-tailored-motion="on" data-font-preset="3">
     <div class="bg-grain" aria-hidden="true"></div>
     <div class="bg-beans" aria-hidden="true"></div>
+    <div class="tailored-atmosphere" aria-hidden="true">
+      <span class="tailored-orb orb-a"></span>
+      <span class="tailored-orb orb-b"></span>
+      <span class="tailored-orb orb-c"></span>
+      <span class="tailored-particle p-1"></span>
+      <span class="tailored-particle p-2"></span>
+      <span class="tailored-particle p-3"></span>
+      <span class="tailored-particle p-4"></span>
+      <span class="tailored-particle p-5"></span>
+      <span class="tailored-particle p-6"></span>
+      <span class="tailored-particle p-7"></span>
+      <span class="tailored-particle p-8"></span>
+      <span class="tailored-particle p-9"></span>
+    </div>
+    <div class="site-tint" aria-hidden="true"></div>
 
     <header class="site-header">
       <div class="container nav-wrap">
@@ -63,7 +82,7 @@
       </div>
     </header>
 
-    <main>
+    <main class="site-main">
       <section class="hero container">
         <div class="hero-copy reveal-up">
           <p class="eyebrow">iOS app for home espresso enthusiasts</p>
@@ -141,6 +160,119 @@
         </div>
       </section>
 
+      <section class="stands-out container" id="stands-out">
+        <div class="section-head reveal-up">
+          <p class="eyebrow">What's Different</p>
+          <h2>More than a shot timer.</h2>
+        </div>
+        <div class="showcase-view-creative" aria-label="Creative layout">
+          <section class="creative-hero reveal-up">
+            <p class="eyebrow">Brew Loop</p>
+            <h3>From random shots to repeatable drinks.</h3>
+            <p>
+              Barista Journal is built as a cycle: log details, diagnose what happened, save what
+              worked, and improve every new bag.
+            </p>
+            <ul class="creative-tags" aria-label="Creative view highlights">
+              <li>Shot Gallery</li>
+              <li>Recipe Presets</li>
+              <li>Taste Diagnosis</li>
+              <li>Curated Shop</li>
+            </ul>
+          </section>
+
+          <ol class="creative-flow" aria-label="Barista Journal workflow timeline">
+            <li>
+              <span>1</span>
+              <div>
+                <h4>Log full drink context</h4>
+                <p>Dose, yield, extraction, milk, syrups, and crema captured in one pass.</p>
+              </div>
+            </li>
+            <li>
+              <span>2</span>
+              <div>
+                <h4>Diagnose and adjust</h4>
+                <p>Use taste and extraction clues to quickly tune grind, yield, and timing.</p>
+              </div>
+            </li>
+            <li>
+              <span>3</span>
+              <div>
+                <h4>Save your best recipe</h4>
+                <p>Turn great shots into reusable presets for flat whites, cortados, and more.</p>
+              </div>
+            </li>
+          </ol>
+
+          <section class="creative-compare" aria-label="Before and after comparison">
+            <article class="compare-panel compare-before">
+              <p class="eyebrow">Without Barista Journal</p>
+              <ul>
+                <li>Guesswork between shots</li>
+                <li>No memory of your best settings</li>
+                <li>More wasted beans and milk</li>
+              </ul>
+            </article>
+            <article class="compare-panel compare-after">
+              <p class="eyebrow">With Barista Journal</p>
+              <ul>
+                <li>Shot gallery with searchable history</li>
+                <li>Presets for repeatable drinks</li>
+                <li>Trends, cost tracking, and gear picks</li>
+              </ul>
+            </article>
+          </section>
+        </div>
+
+        <div class="showcase-view-fashion" aria-label="Fashion layout">
+          <section class="fashion-header reveal-up">
+            <p class="fashion-issue">Issue 01</p>
+            <h3>The Home Espresso Edit</h3>
+            <p class="fashion-dek">
+              Barista Journal treats brewing like craft, not chaos. It captures your ritual,
+              preserves your best formulas, and turns every cup into a deliberate result.
+            </p>
+          </section>
+
+          <div class="fashion-columns reveal-up delay-1">
+            <p><span>Gallery</span> Every shot is archived as part of a living coffee journal, searchable by drink, bean, and quality.</p>
+            <p><span>Presets</span> Signature recipes stay ready: milk, syrup, extraction, and machine choices locked for repeatable pours.</p>
+            <p><span>Diagnosis</span> Flavor notes become direction. Less guessing, fewer wasted beans, faster improvement.</p>
+            <p><span>Shop</span> A curated list of beans and tools worth buying, selected for real home barista workflows.</p>
+          </div>
+
+          <p class="fashion-signoff reveal-up delay-2">
+            Not a generic coffee tracker. A focused brewing publication, written by your own data.
+          </p>
+        </div>
+
+        <div class="showcase-view-tailored" aria-label="Tailored layout">
+          <section class="tailored-intro reveal-up">
+            <p class="eyebrow">Built Around Your Workflow</p>
+            <h3>This feels like your own brew notebook, not a template landing page.</h3>
+            <p>
+              You log a shot, diagnose what happened, save the version that worked, and revisit it
+              later with context that actually matters.
+            </p>
+          </section>
+
+          <div class="tailored-lines reveal-up delay-1">
+            <p><strong>Gallery memory:</strong> every shot stays searchable by bean, recipe, and rating.</p>
+            <p><strong>Recipe presets:</strong> one tap to load your exact flat white or cortado setup.</p>
+            <p><strong>Diagnosis loop:</strong> tasting notes become direct grind, yield, and timing adjustments.</p>
+            <p><strong>Curated shop:</strong> your handpicked affiliate links for beans and tools you trust.</p>
+          </div>
+
+          <div class="tailored-rhythm reveal-up delay-2" aria-label="Product rhythm">
+            <p>Capture.</p>
+            <p>Interpret.</p>
+            <p>Refine.</p>
+            <p>Repeat.</p>
+          </div>
+        </div>
+      </section>
+
       <section class="screens container reveal-up" id="screens">
         <div class="section-head">
           <p class="eyebrow">App preview</p>
@@ -197,9 +329,50 @@
     </main>
 
     <footer class="site-footer container">
-      <p>Barista Journal • iOS waitlist</p>
-      <a href="/privacy.html" class="btn btn-ghost footer-link">Privacy Policy</a>
+      <p>© 2026 Barista Journal. All rights reserved.</p>
+      <div class="footer-right">
+        <a href="mailto:office@baristajournalpro.com" class="footer-email">office@baristajournalpro.com</a>
+        <a href="/privacy.html" class="btn btn-ghost footer-link">Privacy Policy</a>
+      </div>
     </footer>
+
+    <aside class="tailored-controls" id="tailored-controls" aria-label="Effect controls">
+      <p class="controls-title">FX Debug Lab</p>
+      <label><span>Motion <strong class="control-value" id="value-motion"></strong></span><input type="checkbox" id="control-motion" checked /></label>
+      <label><span>Pointer Lag <strong class="control-value" id="value-lag"></strong></span><input type="range" id="control-lag" min="0.01" max="0.2" step="0.005" value="0.06" /></label>
+      <label><span>Light Intensity <strong class="control-value" id="value-light"></strong></span><input type="range" id="control-light" min="0.2" max="1.4" step="0.05" value="1" /></label>
+      <label><span>Particle Wobble <strong class="control-value" id="value-wobble"></strong></span><input type="range" id="control-wobble" min="0" max="2.5" step="0.05" value="1" /></label>
+      <label><span>Particle Twinkle <strong class="control-value" id="value-twinkle"></strong></span><input type="range" id="control-twinkle" min="0" max="2" step="0.05" value="1" /></label>
+      <label><span>Scroll React <strong class="control-value" id="value-scroll"></strong></span><input type="range" id="control-scroll" min="0" max="0.9" step="0.02" value="0.35" /></label>
+      <label><span>Breathe Distance <strong class="control-value" id="value-breathe-distance"></strong></span><input type="range" id="control-breathe-distance" min="0" max="10" step="0.5" value="3" /></label>
+      <label><span>Breathe Speed <strong class="control-value" id="value-breathe-speed"></strong></span><input type="range" id="control-breathe-speed" min="2.5" max="12" step="0.2" value="6.8" /></label>
+      <label><span>BG Darken <strong class="control-value" id="value-bg-darken"></strong></span><input type="range" id="control-bg-darken" min="0" max="0.8" step="0.01" value="0.1" /></label>
+      <label><span>Darken Color <strong class="control-value" id="value-bg-color"></strong></span><input type="color" id="control-bg-color" value="#000000" /></label>
+      <label>
+        <span>Glass Style <strong class="control-value" id="value-glass"></strong></span>
+        <select id="control-glass">
+          <option value="frosted">Frosted</option>
+          <option value="clear">Clear</option>
+        </select>
+      </label>
+      <label><span>Frosted Level <strong class="control-value" id="value-frost"></strong></span><input type="range" id="control-frost" min="0" max="2" step="0.05" value="1" /></label>
+      <label>
+        <span>Font Combo <strong class="control-value" id="value-font"></strong></span>
+        <select id="control-font">
+          <option value="1">1 - Copper Classic</option>
+          <option value="2">2 - Editorial Night</option>
+          <option value="3">3 - Luxury Modern</option>
+          <option value="4">4 - Gallery Serif</option>
+          <option value="5">5 - Heritage Journal</option>
+          <option value="6">6 - Boutique Sans</option>
+          <option value="7">7 - Contrast Studio</option>
+          <option value="8">8 - Runway Grid</option>
+          <option value="9">9 - Soft Prestige</option>
+          <option value="10">10 - Vintage Reserve</option>
+        </select>
+      </label>
+      <button type="button" class="controls-reset" id="control-reset">Reset</button>
+    </aside>
 
     <script type="module" src="script.js"></script>
     <!-- Vercel Analytics -->
