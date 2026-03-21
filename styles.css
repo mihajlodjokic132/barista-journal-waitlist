@@ -847,6 +847,10 @@ h2 {
   flex-shrink: 0;
 }
 
+.site-footer .btn-ghost {
+  width: auto;
+}
+
 .policy-shell {
   padding: clamp(var(--space-xl), 5vw, 64px) 0 var(--space-xxl);
 }
@@ -2051,6 +2055,23 @@ body[data-site-style="creative"] .tailored-controls select {
   .site-footer {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .footer-right {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .footer-email {
+    overflow-wrap: anywhere;
+  }
+
+  .footer-link,
+  .site-footer .footer-link.btn-ghost {
+    width: 100%;
+    max-width: 340px;
   }
 
   .style-switch {
